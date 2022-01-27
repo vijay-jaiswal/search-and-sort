@@ -16,7 +16,6 @@ function App() {
       console.error(error);
     }
   }
-
   useEffect(() => {
     fetchData();
   }, []);
