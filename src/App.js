@@ -2,10 +2,15 @@ import "./App.css";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { DropdownButton, Dropdown } from "react-bootstrap";
+
 function App() {
   const [detail, setdetail] = useState([]);
   const [searchlist, setSearchlist] = useState();
+  const [flag, setFlag] = useState("");
+  const [title, setTitle] = useState("");
+  const [matching, setMatching] = useState("");
 
+  //...........fetching API...........................
   async function fetchData() {
     try {
       const result = await axios.get(
@@ -16,51 +21,75 @@ function App() {
       console.error(error);
     }
   }
+
   useEffect(() => {
     fetchData();
   }, []);
 
+  //.................onchange searching ....................
   const handleSearch = (e) => {
     if (e.target.value !== "") {
+      setTitle(e.target.value);
       let select = "";
       searchlist ? (select = searchlist) : (select = detail);
-      const match = select.filter((elm) => {
+      var match = select.filter((elm) => {
         return Object.values(elm.title)
           .join("")
           .toLowerCase()
           .includes(e.target.value.toLowerCase());
       });
       setSearchlist(match);
+    
     } else {
       setSearchlist(detail);
     }
+    
   };
-
+ 
   const handleAll = () => {
     setSearchlist(detail);
   };
 
   const handleCompleted = () => {
-    let select = "";
-    searchlist ? (select = searchlist) : (select = detail);
-    {
-      const match = select.filter((elm) => {
+    if (searchlist) {
+      let select = "";
+      flag ? (select = searchlist) : (select = detail);
+      {
+        const match = select.filter((elm) => {
+          return elm.completed === true;
+        });
+        setSearchlist(match);
+        setFlag(true);
+      }
+    } else {
+      const match = detail.filter((elm) => {
         return elm.completed === true;
       });
       setSearchlist(match);
+      setFlag(true);
     }
   };
 
   const handleUnCompleted = () => {
-    let select = "";
-    searchlist ? (select = searchlist) : (select = detail);
-    {
-      const match = select.filter((elm) => {
+    if (!flag) {
+      let select = "";
+      searchlist ? (select = searchlist) : (select = detail);
+      {
+        const match = select.filter((elm) => {
+          return elm.completed === false;
+        });
+        setSearchlist(match);
+        setFlag(false);
+      }
+    } else {
+      const match = detail.filter((elm) => {
         return elm.completed === false;
       });
       setSearchlist(match);
+      setFlag(false);
     }
   };
+
   return (
     <>
       <div
